@@ -5,6 +5,11 @@ pipeline {
         maven 'M3'
     }
 
+    environment {
+        DOCKER_USER = credentials('docker_user')
+        DOCKER_TOKEN = credentials('docker_token')
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -36,21 +41,14 @@ pipeline {
 
         stage('Dockerize') {
             steps {
-               
-                // Run Maven on a Unix agent.
-                //sh "mvn -Dmaven.test.failure.ignore=true clean package"
-                echo "Should be done"
-                // To run Maven on a Windows agent, use
-                // bat "mvn -Dmaven.test.failure.ignore=true clean package"
+               script {
+                def dockerImage = "${DOCKER_USER}/transactions"
+                echo "----------------- Build docker image : ${dockerImage}-----------------"
+                sh "docker build -f Dockerfile -t ${dockerImage} ." 
+               }
             }
 
-            /*post {
-                // If Maven was able to run the tests, even if some of the test
-                // failed, record the test results and archive the jar file.
-                success {
-                    
-                }
-            }*/
+            
         }
 
         stage('Docker Publish') {

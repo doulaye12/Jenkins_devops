@@ -4,5 +4,5 @@ COPY ../src/main/resources/application-docker.properties /usr/app/application.pr
 COPY ./entrypoint.sh /usr/bin/entrypoint.sh
 WORKDIR /usr/app
 RUN chmod +x /usr/bin/entrypoint.sh
-EXPOSE 8080
+EXPOSE 8081
 ENTRYPOINT ["entrypoint.sh"]
