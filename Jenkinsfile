@@ -53,12 +53,15 @@ pipeline {
 
         stage('Docker Publish') {
             steps {
-               
-                // Run Maven on a Unix agent.
-                //sh "mvn -Dmaven.test.failure.ignore=true clean package"
-                echo "Should be done"
-                // To run Maven on a Windows agent, use
-                // bat "mvn -Dmaven.test.failure.ignore=true clean package"
+                script {
+                    def dockerImage = "${DOCKER_USER}/transactions"
+                    sh """
+                    echo ${DOCKER_TOKEN} | docker login --username ${DOCKER_USER} --password-stdin
+                    docker push ${dockerImage}
+                    """
+               }
+            
+                
             }
 
             /*post {
