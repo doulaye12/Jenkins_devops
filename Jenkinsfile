@@ -8,7 +8,7 @@ pipeline {
     environment {
         DOCKER_USER = credentials('docker_user')
         DOCKER_TOKEN = credentials('docker_token')
-        SONAR_HOST = credentials('http://localhost:9000')
+        SONAR_HOST = 'http://localhost:9000'
     }
 
     stages {
