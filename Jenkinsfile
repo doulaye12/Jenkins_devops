@@ -8,6 +8,7 @@ pipeline {
     environment {
         DOCKER_USER = credentials('docker_user')
         DOCKER_TOKEN = credentials('docker_token')
+        SONAR_HOST = credentials('http://localhost:9000')
     }
 
     stages {
@@ -20,6 +21,17 @@ pipeline {
             
         }
 
+        stage('Code Quality Check') {
+            steps {
+
+                echo "---------------------- Code QualityMain ------------------------------------------------"
+                echo "We will run sonarQube here."
+                withCredentials([string(credentialsId: 'sonar_token', variable: 'SONARQUBETOKEN')]) {
+					sh "mvn sonar:sonar -Dsonar.login=$SONARQUBETOKEN -Dsonar.host.url=${env.SONAR_HOST}"
+				}
+            }
+        }
+        
         stage('Build') {
             steps {
                
