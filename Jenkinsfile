@@ -26,7 +26,7 @@ pipeline {
 
                 echo "---------------------- Code QualityMain ------------------------------------------------"
                 echo "We will run sonarQube here."
-                sh "mvn clean verify sonar:sonar -Dsonar.projectKey=transactions-api -Dsonar.projectName='transactions-api'"
+                sh "mvn clean verify sonar:sonar -Dsonar.projectKey=transactions-api -Dsonar.projectName='transactions-api' -Dsonar.host.url=${env.SONAR_HOST}"
             }
         }
         
