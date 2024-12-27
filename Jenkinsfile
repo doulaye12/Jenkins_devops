@@ -9,7 +9,7 @@ pipeline {
         DOCKER_USER = credentials('docker_user')
         DOCKER_TOKEN = credentials('docker_token')
         SONAR_HOST = 'http://localhost:9000'
-        SONARQUBETOKEN = 'sqp_2128838ea70bab7f2e51545b68684f0f97610e21'
+        SONARQUBETOKEN = 'sqp_d4c594a6e788304052b23409c6dedc1855780f06'
     }
 
     stages {
