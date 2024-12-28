@@ -51,46 +51,58 @@ pipeline {
                script {
                 def dockerImage = "${DOCKER_USER}/transactions:${env.BRANCH_NAME}"
                 echo "----------------- Build docker image : ${dockerImage}-----------------"
-                sh "docker build -f Dockerfile -t ${dockerImage} ." 
-               }
-            }
-
-            
-        }
-
-        stage('Docker Publish develop') {
-
-            when {
-               branch 'develop'
-            }
-
-            steps {
-                script {
-                    def dockerImage = "${DOCKER_USER}/transactions:${env.BRANCH_NAME}"
-                    sh """
+                sh """
+                    docker build -f Dockerfile -t ${dockerImage} .
                     echo ${DOCKER_TOKEN} | docker login --username ${DOCKER_USER} --password-stdin
                     docker push ${dockerImage}
-                    """
+
+                    docker compose down
+                    docker compose up -d
+                """
                }
-            
-                
             }
 
+            
         }
 
+        stage('Dockerize release') {
 
-        stage('Docker Compose') {
-            
             when {
-               branch 'develop'
+               branch 'release/*'
             }
 
             steps {
+               script {
+                def dockerImage = "${DOCKER_USER}/transactions:release-${BUILD_NUMBER}"
+                echo "----------------- Build docker image : ${dockerImage}-----------------"
                 sh """
-                docker compose down
-                docker compose up -d
+                    docker build -f Dockerfile -t ${dockerImage} .
+                    echo ${DOCKER_TOKEN} | docker login --username ${DOCKER_USER} --password-stdin
+                    docker push ${dockerImage}
                 """
+               }
             }
+
+            
+        }
+
+        stage('Dockerize production') {
+
+            when {
+               tag "v*"
+            }
+
+            steps {
+               script {
+                def dockerImage = "${DOCKER_USER}/transactions:${env.TAG_NAME}"
+                echo "----------------- Build docker image : ${dockerImage}-----------------"
+                sh "docker build -f Dockerfile -t ${dockerImage} ." 
+                sh "echo ${DOCKER_TOKEN} | docker login --username ${DOCKER_USER} --password-stdin"
+                sh "docker push ${dockerImage}"
+               }
+            }
+
+            
         }
     }
 } 
