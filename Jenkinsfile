@@ -9,7 +9,7 @@ pipeline {
         DOCKER_USER = credentials('docker_user')
         DOCKER_TOKEN = credentials('docker_token')
         SONAR_HOST = 'http://localhost:9000'
-        SONARQUBETOKEN = 'sqp_d4c594a6e788304052b23409c6dedc1855780f06'
+        
     }
 
     stages {
@@ -27,7 +27,13 @@ pipeline {
 
                 echo "---------------------- Code QualityMain ------------------------------------------------"
                 echo "We will run sonarQube here."
-                sh "mvn clean verify sonar:sonar -Dsonar.login=$SONARQUBETOKEN -Dsonar.projectKey=transactions-api -Dsonar.projectName='transactions-api' -Dsonar.host.url=${env.SONAR_HOST}"
+                withCredentials([string(credentialsId: 'sonar_token_2', variable: 'SONARQUBETOKEN')]) {
+					sh "mvn sonar:sonar -Dsonar.login=$SONARQUBETOKEN -Dsonar.qualitygate.wait=true -Dsonar.host.url=${env.SONAR_HOST}"
+				}
+
+                withSonarQubeEnv('sonarqube') {
+                    sh 'mvn sonar:sonar -Dsonar.qualitygate.wait=true'
+                }
             }
         }
         
