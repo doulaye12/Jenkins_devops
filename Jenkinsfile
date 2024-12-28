@@ -28,9 +28,12 @@ pipeline {
                 echo "---------------------- Code QualityMain ------------------------------------------------"
                 echo "We will run sonarQube here."
 
-                withSonarQubeEnv('sonarqube') {
+                withCredentials([string(credentialsId: 'sonar_token_2', variable: 'SONARQUBETOKEN')]) {
+					sh "mvn sonar:sonar -Dsonar.login=$SONARQUBETOKEN -Dsonar.qualitygate.wait=true -Dsonar.host.url=${env.SONAR_HOST}"
+				}
+                /*withSonarQubeEnv('sonarqube') {
                     sh 'mvn sonar:sonar -Dsonar.qualitygate.wait=true'
-                }
+                } */
             }
         }
         
