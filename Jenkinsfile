@@ -88,7 +88,7 @@ pipeline {
             steps {
                 sh """
                 docker compose down
-                docker compose -d up
+                docker compose up -d
                 """
             }
         }
