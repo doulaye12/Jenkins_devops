@@ -1,7 +1,7 @@
 #!/bin/sh
 echo "starting container $hostname"
 if [ -z "$DATASOURCE_URL" ]; then
-  echo "Container failed to start, please  -e DATASOURCE_URL=jdbc:postgresql://localhost:5432/vendutou"
+  echo "Container failed to start, please pass -e DATASOURCE_URL=jdbc:postgresql://localhost:5432/vendutou"
   exit 1
 fi
 
