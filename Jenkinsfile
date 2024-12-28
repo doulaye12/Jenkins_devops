@@ -21,21 +21,6 @@ pipeline {
             }
             
         }
-
-        /*stage('Code Quality Check') {
-            steps {
-
-                echo "---------------------- Code QualityMain ------------------------------------------------"
-                echo "We will run sonarQube here."
-
-                /*withCredentials([string(credentialsId: 'sonar_token_2', variable: 'SONARQUBETOKEN')]) {
-					sh "mvn sonar:sonar -Dsonar.login=$SONARQUBETOKEN -Dsonar.projectKey=transactions-api -Dsonar.projectName='transactions-api' -Dsonar.qualitygate.wait=true -Dsonar.host.url=${env.SONAR_HOST}"
-				}*/
-                /*withSonarQubeEnv('sonarqube') {
-                    sh "mvn sonar:sonar -Dsonar.qualitygate.wait=true -Dsonar.projectKey=transactions-api -Dsonar.projectName='transactions-api'"
-                }
-            }
-        }*/
         
         stage('Build') {
             steps {
@@ -51,15 +36,20 @@ pipeline {
                 // If Maven was able to run the tests, even if some of the test
                 // failed, record the test results and archive the jar file.
                 success {
-                    archiveArtifacts artifacts: '**/*.jar', followSymlinks: false
+                    archiveArtifacts artifacts: 'target/*.jar', followSymlinks: false
                 }
             }
         }
 
-        stage('Dockerize') {
+        stage('Dockerize develop') {
+
+            when {
+               branch 'develop'
+            }
+
             steps {
                script {
-                def dockerImage = "${DOCKER_USER}/transactions"
+                def dockerImage = "${DOCKER_USER}/transactions:${env.BRANCH_NAME}"
                 echo "----------------- Build docker image : ${dockerImage}-----------------"
                 sh "docker build -f Dockerfile -t ${dockerImage} ." 
                }
@@ -68,10 +58,15 @@ pipeline {
             
         }
 
-        stage('Docker Publish') {
+        stage('Docker Publish develop') {
+
+            when {
+               branch 'develop'
+            }
+
             steps {
                 script {
-                    def dockerImage = "${DOCKER_USER}/transactions"
+                    def dockerImage = "${DOCKER_USER}/transactions:${env.BRANCH_NAME}"
                     sh """
                     echo ${DOCKER_TOKEN} | docker login --username ${DOCKER_USER} --password-stdin
                     docker push ${dockerImage}
@@ -85,6 +80,11 @@ pipeline {
 
 
         stage('Docker Compose') {
+            
+            when {
+               branch 'develop'
+            }
+
             steps {
                 sh """
                 docker compose down
