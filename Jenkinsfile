@@ -8,7 +8,7 @@ pipeline {
     environment {
         DOCKER_USER = credentials('docker_user')
         DOCKER_TOKEN = credentials('docker_token')
-        SONAR_HOST = 'http://localhost:9000'
+        SONAR_HOST = 'http://sonar.mmkmou.xyz'
         
     }
 
@@ -22,6 +22,21 @@ pipeline {
             
         }
         
+        stage('Code Quality Check') {
+            steps {
+
+                echo "---------------------- Code QualityMain ------------------------------------------------"
+                echo "We will run sonarQube here."
+
+                withCredentials([string(credentialsId: 'sonar_token', variable: 'SONARQUBETOKEN')]) {
+					sh "mvn sonar:sonar -Dsonar.login=$SONARQUBETOKEN -Dsonar.projectKey=transaction-develop -Dsonar.projectName='transaction-develop' -Dsonar.host.url=${env.SONAR_HOST}"
+				}
+                /*withSonarQubeEnv('sonarqube') {
+                    sh "mvn sonar:sonar -Dsonar.qualitygate.wait=true -Dsonar.projectKey=transactions-api -Dsonar.projectName='transactions-api'"
+                }*/
+            }
+        }
+
         stage('Build') {
             steps {
                
@@ -89,7 +104,10 @@ pipeline {
         stage('Dockerize production') {
 
             when {
-               tag "v*"
+                allOf {
+                    branch 'main'
+                    tag 'v*'
+                }
             }
 
             steps {
