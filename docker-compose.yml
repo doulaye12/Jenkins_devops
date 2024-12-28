@@ -1,6 +1,6 @@
 services: 
   transaction: 
-    image: mmkmou/transactions
+    image: mmkmou/transactions:develop
     environment:
       DATASOURCE_USERNAME: transaction
       DATASOURCE_PASSWORD: passer
