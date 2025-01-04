@@ -28,7 +28,7 @@ pipeline {
                 echo "We will run sonarQube here."
 
                 withSonarQubeEnv('sonarqube') {
-                    sh "mvn sonar:sonar -Dsonar.qualitygate.wait=true -Dsonar.projectKey=transaction-develop -Dsonar.projectName='transaction-develop'"
+                    sh "mvn clean compile sonar:sonar -Dsonar.qualitygate.wait=true -Dsonar.projectKey=transaction-develop -Dsonar.projectName='transaction-develop'"
                 }
             }
         }
