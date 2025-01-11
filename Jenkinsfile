@@ -111,12 +111,50 @@ pipeline {
                 def dockerImage = "${DOCKER_USER}/transactions:${env.TAG_NAME}"
                 echo "----------------- Build docker image : ${dockerImage}-----------------"
                 sh "docker build -f Dockerfile -t ${dockerImage} ." 
-                sh "echo ${DOCKER_TOKEN} | docker login --username ${DOCKER_USER} --password-stdin"
-                sh "docker push ${dockerImage}"
+                
+                //sh "echo ${DOCKER_TOKEN} | docker login --username ${DOCKER_USER} --password-stdin"
+                //sh "docker push ${dockerImage}"
                }
             }
 
             
         }
+
+        stage('Security check') {
+
+            when {
+                allOf {
+                    branch 'main'
+                    tag 'v*'
+                }
+            }
+
+            steps {
+               script {
+                def dockerImage = "${DOCKER_USER}/transactions:${env.TAG_NAME}"
+                
+                // configuration trivy 
+                
+                sh "mkdir reports"
+                sh "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl > html.tpl"
+                sh "trivy image --ignore-unfixed --severity CRITICAL,HIGH --format template --template '@html.tpl' -o ./reports/transactions-report.html ${dockerImage}" 
+                publishHTML target : [
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'reports',
+                    reportFiles: 'transactions-scan.html',
+                    reportName: 'Trivy Scan',
+                    reportTitles: 'Trivy Scan'
+                ]
+                
+                //sh "echo ${DOCKER_TOKEN} | docker login --username ${DOCKER_USER} --password-stdin"
+                //sh "docker push ${dockerImage}"
+               }
+            }
+
+            
+        }
+
     }
 } 
