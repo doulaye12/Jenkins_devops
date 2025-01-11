@@ -101,7 +101,6 @@ pipeline {
 
             when {
                 allOf {
-                    branch 'main'
                     tag 'v*'
                 }
             }
@@ -124,7 +123,6 @@ pipeline {
 
             when {
                 allOf {
-                    branch 'main'
                     tag 'v*'
                 }
             }
