@@ -28,7 +28,7 @@ pipeline {
                 // If Maven was able to run the tests, even if some of the test
                 // failed, record the test results and archive the jar file.
                 success {
-                    archiveArtifacts artifacts: '**/*.jar', followSymlinks: false
+                    archiveArtifacts artifacts: 'target/*.jar', followSymlinks: false
                 }
             }
         }
